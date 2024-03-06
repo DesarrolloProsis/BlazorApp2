@@ -1,6 +1,8 @@
 using BlazorApp2.Microservicio.Endpoints;
 using BlazorApp2.Microservicio.Interfaces;
 using BlazorApp2.Microservicio.Services;
+using BlazorApp2.Shared.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IWeatherForecastService, WeatherForecastService>();
+builder.Services.AddDbContext<prosisdb_6testContext>(
+        options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 

@@ -1,28 +1,38 @@
 ﻿using BlazorApp2.Microservicio.Interfaces;
 using BlazorApp2.Shared;
+using BlazorApp2.Shared.Data;
+using Microsoft.EntityFrameworkCore;
+using static System.Net.WebRequestMethods;
 
 namespace BlazorApp2.Microservicio.Services
 {
     public class WeatherForecastService : IWeatherForecastService
     {
-        private static readonly string[] Summaries = new[]
+        public prosisdb_6testContext _dbContext { get; }
+
+        public WeatherForecastService(prosisdb_6testContext dbContext)
         {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+            _dbContext = dbContext;
+        }
 
         public async Task<IEnumerable<WeatherForecast>> GetWeatherForecast()
         {
             try
             {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
+
+                var weathers =  _dbContext.WeatherForecasts1.Where(weatherforecast => weatherforecast.Id > 0);
+                var weatherList = await weathers.ToListAsync();
+                List<WeatherForecast> myWeatherList = new List<WeatherForecast>();
+                foreach (var weather in weatherList)
                 {
-                    Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    TemperatureC = Random.Shared.Next(-20, 55),
-                    Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-                })
-            .ToArray();
-                return forecast;
+                    WeatherForecast WeatherClass = new WeatherForecast();
+                    WeatherClass.Date = DateOnly.FromDateTime(weather.Date);
+                    WeatherClass.TemperatureC = weather.TemperatureC;
+                    WeatherClass.Summary = weather.Summary;
+                    myWeatherList.Add(WeatherClass);
+                }
+                IEnumerable<WeatherForecast> enumerableWeatherForecast = myWeatherList.AsEnumerable();
+                return enumerableWeatherForecast;
             }
             catch (Exception ex)
             {
